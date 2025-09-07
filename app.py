@@ -27,8 +27,11 @@ def ensure_authenticated():
     if st.session_state.get("authenticated", False):
         return True
     
-    # 获取密码（环境变量或默认值）
-    correct_password = os.environ.get("ACCESS_PASSWORD", "12345aB")
+    # 获取密码（仅从环境变量，无默认值）
+    correct_password = os.environ.get("ACCESS_PASSWORD")
+    if not correct_password:
+        st.error("❌ ACCESS_PASSWORD environment variable not set. Please configure password in docker-compose.yml or .env file.")
+        st.stop()
     
     # 设置页面配置（在显示登录界面之前）
     st.set_page_config(

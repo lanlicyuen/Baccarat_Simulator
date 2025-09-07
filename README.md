@@ -57,21 +57,51 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-4. **启动应用** / Run application
+4. **配置环境变量** / Configure environment variables
+```bash
+# 复制环境变量模板 / Copy environment template
+cp .env.example .env
+
+# 编辑 .env 文件，设置你的密码 / Edit .env file to set your password
+# ACCESS_PASSWORD=your_secure_password_here
+```
+
+5. **启动应用** / Run application
 ```bash
 streamlit run app.py
 ```
 
-5. **访问界面** / Access interface
+6. **访问界面** / Access interface
 ```bash
 浏览器打开: http://localhost:8501
 Browser: http://localhost:8501
 ```
 
-## 🐳 Docker 部署 / Docker Deployment
+## � 安全配置 / Security Configuration
+
+### 密码设置 / Password Setup
+出于安全考虑，需要设置访问密码：  
+For security reasons, you need to set an access password:
+
+```bash
+# 方法1：使用 .env 文件 / Method 1: Using .env file
+cp .env.example .env
+# 编辑 .env 文件设置 ACCESS_PASSWORD / Edit .env file to set ACCESS_PASSWORD
+
+# 方法2：环境变量 / Method 2: Environment variable
+export ACCESS_PASSWORD=your_secure_password_here
+
+# 方法3：Docker Compose / Method 3: Docker Compose
+# 编辑 docker-compose.yml 中的 ACCESS_PASSWORD / Edit ACCESS_PASSWORD in docker-compose.yml
+```
+
+## �🐳 Docker 部署 / Docker Deployment
 
 ### 使用 Docker Compose / Using Docker Compose
 ```bash
+# 设置密码环境变量 / Set password environment variable
+export ACCESS_PASSWORD=your_secure_password_here
+
 # 构建并启动 / Build and start
 docker-compose up -d
 
