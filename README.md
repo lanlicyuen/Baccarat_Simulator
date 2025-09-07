@@ -26,6 +26,20 @@ A comprehensive Baccarat simulator with strategy backtesting, bet management, an
 - **流水分析** / Turnover analysis
 - **盈亏分布** / Profit/loss distribution charts
 
+## 📸 界面预览 / Interface Preview
+
+### 🎮 播放模式界面 / Playback Mode Interface
+逐局可视化，实时观看百家乐游戏进程  
+Hand-by-hand visualization with real-time game progress
+
+![播放模式界面](sample/1.png)
+
+### ⚡ 极速模式界面 / Fast Mode Interface  
+批量模拟分析，完整数据报告和图表展示  
+Batch simulation analysis with comprehensive reports and charts
+
+![极速模式界面](sample/2.png)
+
 ## ⚡ 快速体验 / Quick Demo
 
 **一键启动 Docker 版本 / One-click Docker startup:**
