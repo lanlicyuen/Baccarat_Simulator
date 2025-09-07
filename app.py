@@ -450,7 +450,7 @@ def ensure_authenticated():
     </div>
     """, unsafe_allow_html=True)
     
-    # Logo容器 - 在主容器上方
+    # Logo容器 - 在最上面
     st.markdown(f'''
     <div class="logo-container">
         <h1 class="auth-title">🎰 {t("baccarat_simulator")}</h1>
@@ -458,7 +458,7 @@ def ensure_authenticated():
     </div>
     ''', unsafe_allow_html=True)
     
-    # 在登录页面也添加语言选择器
+    # 语言选择器 - 在Logo之后
     with st.container():
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
@@ -469,7 +469,7 @@ def ensure_authenticated():
     with st.form("login_form", clear_on_submit=False):
         # 密码输入框
         password = st.text_input(
-            "Password",
+            t("password"),
             type="password",
             placeholder=t("password_placeholder"),
             key="password_input",
@@ -609,23 +609,23 @@ def render_summary(summary, rebate_pct: float = 0.0):
     roi_with_rebate = (profit_with_rebate / total_wagered) if total_wagered > 0 else 0.0
 
     c1, c2, c3, c4, c5 = st.columns(5)
-    c1.metric("Initial 初始本金", f"{summary.initial_bankroll:,.2f}")
-    c2.metric("Final 期末本金", f"{summary.final_bankroll:,.2f}", f"{summary.total_profit:+,.2f}")
-    c3.metric("ROI 投资回报率", f"{summary.roi*100:.2f}%")
-    c4.metric("Commission 佣金", f"{summary.commission_total:,.2f}")
-    c5.metric("Turnover 流水", f"{total_wagered:,.2f}")
+    c1.metric(t("initial_capital"), f"{summary.initial_bankroll:,.2f}")
+    c2.metric(t("final_capital"), f"{summary.final_bankroll:,.2f}", f"{summary.total_profit:+,.2f}")
+    c3.metric(t("roi_label"), f"{summary.roi*100:.2f}%")
+    c4.metric(t("commission_label"), f"{summary.commission_total:,.2f}")
+    c5.metric(t("turnover_label"), f"{total_wagered:,.2f}")
 
     c6, c7, c8, c9, c10 = st.columns(5)
-    c6.metric("Bet hands 下注局数", f"{summary.bet_hands}")
-    c7.metric("Observe 观望局数", f"{summary.observe_hands}")
-    c8.metric("Pushes 和局下注", f"{summary.push_hands}")
+    c6.metric(t("bet_hands"), f"{summary.bet_hands}")
+    c7.metric(t("observe_hands"), f"{summary.observe_hands}")
+    c8.metric(t("push_hands"), f"{summary.push_hands}")
     hr = summary.strategy_hit_rate
-    c9.metric("Hit rate 胜率", f"{hr*100:.2f}%" if hr is not None else "N/A")
-    c10.metric("Rebate 返水", f"{rebate_amt:,.2f}")
+    c9.metric(t("hit_rate"), f"{hr*100:.2f}%" if hr is not None else "N/A")
+    c10.metric(t("rebate_label"), f"{rebate_amt:,.2f}")
 
     c11, c12 = st.columns(2)
-    c11.metric("Profit+Rebate 含返水收益", f"{profit_with_rebate:+,.2f}")
-    c12.metric("ROI(含返)", f"{roi_with_rebate*100:.2f}%")
+    c11.metric(t("profit_rebate"), f"{profit_with_rebate:+,.2f}")
+    c12.metric(t("roi_with_rebate"), f"{roi_with_rebate*100:.2f}%")
 
     st.write(
         f"Outcomes 结果: Player 闲 {summary.player_wins} ({summary.outcome_distribution['player']['pct']*100:.2f}%), "
@@ -653,7 +653,7 @@ def _settings_sidebar_io(section_title: str, mode: str, values: dict):
         # Download JSON
         payload = {"mode": mode, "autorun": autorun, **values}
         json_bytes = json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8")
-        st.download_button("下载设定JSON", data=json_bytes, file_name=f"baccarat_{mode}_settings.json", mime="application/json")
+        st.download_button(t("download_settings_json"), data=json_bytes, file_name=f"baccarat_{mode}_settings.json", mime="application/json")
 
         c1, c2 = st.columns(2)
         if c1.button("保存到本地文件"):
@@ -688,7 +688,7 @@ def page_play_mode():
     strategy_options = {
         "flip-opposite-wait": t("flip_opposite_wait"),
         "always-banker": t("always_banker"),
-        "always_player": t("always_player"),
+        "always-player": t("always_player"),
         "alternate": t("alternate"),
         "random": t("random")
     }
@@ -702,8 +702,8 @@ def page_play_mode():
     
     seed_str = st.sidebar.text_input(t("random_seed"), key="play_seed_str")
     seed = int(seed_str) if seed_str.strip().isdigit() else None
-    speed_sec = st.sidebar.slider("Speed (sec)", min_value=0.0, max_value=60.0, value=0.3, step=0.1, key="play_speed")
-    auto_scroll = st.sidebar.checkbox("Auto scroll", value=True, key="play_auto_scroll")
+    speed_sec = st.sidebar.slider(t("speed"), min_value=0.0, max_value=60.0, value=0.3, step=0.1, key="play_speed")
+    auto_scroll = st.sidebar.checkbox(t("auto_scroll"), value=True, key="play_auto_scroll")
     rebate_pct = st.sidebar.number_input(t("rebate") + " (%)", min_value=0.0, max_value=10.0, value=0.0, step=0.1, key="play_rebate_pct")
     
     st.sidebar.markdown("---")
@@ -771,7 +771,7 @@ def page_play_mode():
 
     # Save/Load settings utilities
     _settings_sidebar_io(
-        "保存/载入设定",
+        t("save_load_settings"),
         mode="play",
         values={
             "bankroll": bankroll,
@@ -820,7 +820,7 @@ def page_play_mode():
             json_path=None,
         )
 
-    if st.sidebar.button("Reset"):
+    if st.sidebar.button(t("reset")):
         reset_state()
 
     if st.session_state.params is None:
@@ -854,22 +854,22 @@ def page_play_mode():
         st.session_state.gen = simulate_hands(st.session_state.params, yield_per_hand=True)
         st.session_state.playing = True
 
-    st.title("Baccarat Simulator - Playback")
+    st.title(t("baccarat_simulator_playback"))
 
     # Controls
     c_ctrl1, c_ctrl2, c_ctrl3, c_ctrl4, c_ctrl5, c_ctrl6 = st.columns(6)
-    if c_ctrl1.button("Start"):
+    if c_ctrl1.button(t("start")):
         st.session_state.params = _build_params_from_widgets()
         st.session_state.gen = simulate_hands(st.session_state.params, yield_per_hand=True)
         st.session_state.playing = True
-    if c_ctrl2.button("Pause"):
+    if c_ctrl2.button(t("pause")):
         st.session_state.playing = False
-    if c_ctrl3.button("Resume"):
+    if c_ctrl3.button(t("resume")):
         if st.session_state.gen is None:
             st.session_state.params = _build_params_from_widgets()
             st.session_state.gen = simulate_hands(st.session_state.params, yield_per_hand=True)
         st.session_state.playing = True
-    if c_ctrl4.button("Next"):
+    if c_ctrl4.button(t("next")):
         if st.session_state.gen is None:
             st.session_state.params = _build_params_from_widgets()
             st.session_state.gen = simulate_hands(st.session_state.params, yield_per_hand=True)
@@ -878,7 +878,7 @@ def page_play_mode():
             st.session_state.events.append(ev)
         except StopIteration:
             st.session_state.playing = False
-    if c_ctrl5.button("Skip 5"):
+    if c_ctrl5.button(t("skip_5")):
         if st.session_state.gen is None:
             st.session_state.params = _build_params_from_widgets()
             st.session_state.gen = simulate_hands(st.session_state.params, yield_per_hand=True)
@@ -889,7 +889,7 @@ def page_play_mode():
             except StopIteration:
                 st.session_state.playing = False
                 break
-    if c_ctrl6.button("Skip to Report"):
+    if c_ctrl6.button(t("skip_to_report")):
         if st.session_state.gen is None:
             st.session_state.params = _build_params_from_widgets()
             st.session_state.gen = simulate_hands(st.session_state.params, yield_per_hand=True)
@@ -947,13 +947,13 @@ def page_play_mode():
         roi_with_rebate = (profit_with_rebate / total_wagered) if total_wagered > 0 else 0.0
 
         k1, k2, k3, k4 = st.columns(4)
-        k1.metric("Turnover 流水", f"{total_wagered:,.2f}")
-        k2.metric("Rebate 返水", f"{rebate_amt:,.2f}")
-        k3.metric("Profit 收益", f"{profit:+,.2f}")
-        k4.metric("ROI/含返", f"{roi*100:.2f}% / {roi_with_rebate*100:.2f}%")
+        k1.metric(t("turnover_label"), f"{total_wagered:,.2f}")
+        k2.metric(t("rebate_label"), f"{rebate_amt:,.2f}")
+        k3.metric(t("total_profit"), f"{profit:+,.2f}")
+        k4.metric(t("roi_with_rebate"), f"{roi*100:.2f}% / {roi_with_rebate*100:.2f}%")
 
         with placeholder_detail.container():
-            st.subheader("当前局详情")
+            st.subheader(t("current_hand_details"))
             st.write(
                 f"Hand #{last.hand_no}: Bet={last.bet_side or '-'} Amt={last.bet_amount:.2f} | "
                 f"P={last.player_cards} ({last.player_total}) vs B={last.banker_cards} ({last.banker_total}) -> {last.outcome} | "
@@ -978,7 +978,7 @@ def page_play_mode():
                 )
                 .properties(height=280)
             )
-            colA.subheader("资金曲线（最近2000局）")
+            colA.subheader(t("bankroll_curve_recent"))
             colA.altair_chart(line, use_container_width=True)
 
         pnl_df = pd.DataFrame({"win_amount": [e.win_amount for e in events]})
@@ -994,7 +994,7 @@ def page_play_mode():
                 )
                 .properties(height=280)
             )
-            colB.subheader("盈亏分布")
+            colB.subheader(t("profit_distribution"))
             colB.altair_chart(hist, use_container_width=True)
 
         # Recent table N=30
@@ -1003,7 +1003,7 @@ def page_play_mode():
 
         # Downloads section - show when there are events
         if len(events) > 0:
-            st.subheader("📥 数据下载")
+            st.subheader(t("data_download"))
             col_down1, col_down2 = st.columns(2)
             
             # Generate full CSV and summary for download
@@ -1035,7 +1035,7 @@ def page_play_mode():
             
             with col_down1:
                 st.download_button(
-                    "📊 下载完整CSV数据", 
+                    t("download_complete_csv"), 
                     data=csv_bytes, 
                     file_name=f"baccarat_playback_{len(events)}hands.csv", 
                     mime="text/csv"
@@ -1043,7 +1043,7 @@ def page_play_mode():
             
             with col_down2:
                 st.download_button(
-                    "📋 下载统计JSON", 
+                    t("download_statistics_json"), 
                     data=json_bytes, 
                     file_name=f"baccarat_playback_summary_{len(events)}hands.json", 
                     mime="application/json"
@@ -1113,7 +1113,7 @@ def page_fast_mode():
         """, unsafe_allow_html=True)
 
     _settings_sidebar_io(
-        "保存/载入设定",
+        t("save_load_settings"),
         mode="fast",
         values={
             "bankroll": bankroll,
@@ -1176,7 +1176,7 @@ def page_fast_mode():
                 )
                 .properties(height=300)
             )
-            colA.subheader("资金曲线（全量）")
+            colA.subheader(t("bankroll_curve_full"))
             colA.altair_chart(line, use_container_width=True)
 
         if len(df) >= 1:
@@ -1191,18 +1191,18 @@ def page_fast_mode():
                 )
                 .properties(height=300)
             )
-            colB.subheader("盈亏分布（全量）")
+            colB.subheader(t("profit_distribution_full"))
             colB.altair_chart(pnl, use_container_width=True)
 
         # Show preview head/tail
-        st.subheader("结果预览（前后各20行）")
+        st.subheader(t("results_preview"))
         st.dataframe(pd.concat([df.head(20), df.tail(20)]), use_container_width=True)
 
         # Downloads
         csv_bytes = df.to_csv(index=False).encode("utf-8")
         json_bytes = json.dumps(asdict(summary), ensure_ascii=False, indent=2).encode("utf-8")
-        st.download_button("下载 CSV", data=csv_bytes, file_name="baccarat_report.csv", mime="text/csv")
-        st.download_button("下载 JSON", data=json_bytes, file_name="baccarat_summary.json", mime="application/json")
+        st.download_button(t("download_csv"), data=csv_bytes, file_name="baccarat_report.csv", mime="text/csv")
+        st.download_button(t("download_json"), data=json_bytes, file_name="baccarat_summary.json", mime="application/json")
 
         if st.button("重新开始"):
             _safe_rerun()
@@ -1220,7 +1220,9 @@ def main():
         # 顶部品牌区：Logo + 版权
         render_sidebar_branding()
         
-        # 语言选择器
+        # 语言选择器 - 添加明显的样式
+        st.markdown("---")
+        st.markdown(f"### 🌐 {t('language')}")
         render_language_selector()
         
         st.markdown("---")
