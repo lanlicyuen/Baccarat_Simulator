@@ -1,0 +1,59 @@
+# 忽略Python缓存文件 / Ignore Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# 忽略虚拟环境 / Ignore virtual environments
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# 忽略IDE配置 / Ignore IDE config
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 忽略日志文件 / Ignore log files
+*.log
+logs/
+
+# 忽略输出文件 / Ignore output files
+out/
+output/
+*.csv
+*.json
+
+# 忽略临时文件 / Ignore temporary files
+.tmp/
+temp/
+*.tmp
+
+# 忽略系统文件 / Ignore system files
+.DS_Store
+Thumbs.db
+
+# 忽略Docker相关 / Ignore Docker related
+.dockerignore
+
+# 忽略环境配置 / Ignore environment config
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# 忽略数据文件 / Ignore data files
+data/
+*.db
+*.sqlite
+
+# 忽略分发文件 / Ignore distribution files
+build/
+dist/
+*.egg-info/

@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  baccarat-simulator:
+    build: .
+    container_name: baccarat-simulator
+    ports:
+      - "9006:8501"  # 映射到原来的端口
+    environment:
+      - ACCESS_PASSWORD=12345aB  # 可以通过环境变量设置密码
+      - LOGO_URL="https://dummyimage.com/600x180/111827/ffffff&text=Baccarat+Simulator"
+      - COPYRIGHT_TEXT="© 2025 1plabs.pro"
+    volumes:
+      - ./data:/app/data  # 如果需要持久化数据
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
