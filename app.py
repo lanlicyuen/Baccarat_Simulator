@@ -11,6 +11,7 @@ import streamlit as st
 import altair as alt
 
 from baccarat_core import RunParams, simulate_hands, save_csv, save_json
+from i18n import t, render_language_selector, get_language, set_language
 
 
 def ensure_authenticated():
@@ -450,12 +451,18 @@ def ensure_authenticated():
     """, unsafe_allow_html=True)
     
     # Logo容器 - 在主容器上方
-    st.markdown('''
+    st.markdown(f'''
     <div class="logo-container">
-        <h1 class="auth-title">🎰 Baccarat Simulator</h1>
-        <p class="auth-subtitle">✨ Please enter access password to continue ✨</p>
+        <h1 class="auth-title">🎰 {t("baccarat_simulator")}</h1>
+        <p class="auth-subtitle">{t("login_subtitle")}</p>
     </div>
     ''', unsafe_allow_html=True)
+    
+    # 在登录页面也添加语言选择器
+    with st.container():
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            render_language_selector()
     
     # 登录表单（使用 Streamlit 原生 form；通过 CSS 对 div[data-testid="stForm"] 做玻璃样式）
     # 使用form来支持Enter键登录
@@ -464,7 +471,7 @@ def ensure_authenticated():
         password = st.text_input(
             "Password",
             type="password",
-            placeholder="Enter password...",
+            placeholder=t("password_placeholder"),
             key="password_input",
             label_visibility="collapsed",
         )
@@ -472,7 +479,7 @@ def ensure_authenticated():
         # 登录按钮 - 放入中间列，强制几何居中
         col_left, col_mid, col_right = st.columns([1, 1, 1])
         with col_mid:
-            submitted = st.form_submit_button("🚀 Enter System", use_container_width=True)
+            submitted = st.form_submit_button(t("login_button"), use_container_width=True)
 
         # 处理登录逻辑
         if submitted:
@@ -484,9 +491,9 @@ def ensure_authenticated():
                 st.rerun()
             else:
                 st.session_state.password_attempts = st.session_state.get("password_attempts", 0) + 1
-                st.error("❌ Incorrect password, please try again")
+                st.error(t("password_error"))
                 if st.session_state.password_attempts >= 3:
-                    st.warning("⚠️ Multiple failed attempts, please check your password")
+                    st.warning(t("password_warning"))
     
     # 版权信息
     st.markdown('''
@@ -670,36 +677,68 @@ def _settings_sidebar_io(section_title: str, mode: str, values: dict):
 
 
 def page_play_mode():
-    st.sidebar.header("Playback Settings")
-    bankroll = st.sidebar.number_input("bankroll 初始本金", min_value=1.0, value=10000.0, step=100.0, key="play_bankroll")
-    bet = st.sidebar.number_input("bet", min_value=0.01, value=200.0, step=10.0, key="play_bet")
-    hands = st.sidebar.number_input("hands 局数", min_value=1, value=1000, step=100, key="play_hands")
-    decks = st.sidebar.selectbox("decks 副牌数", options=[6, 8], index=1, key="play_decks")
-    penetration = st.sidebar.number_input("penetration 渗透阈值", min_value=1, value=52, step=1, key="play_penetration")
+    st.sidebar.header(t("game_settings"))
+    bankroll = st.sidebar.number_input(t("initial_bankroll"), min_value=1.0, value=10000.0, step=100.0, key="play_bankroll")
+    bet = st.sidebar.number_input(t("bet_amount"), min_value=0.01, value=200.0, step=10.0, key="play_bet")
+    hands = st.sidebar.number_input(t("total_hands"), min_value=1, value=1000, step=100, key="play_hands")
+    decks = st.sidebar.selectbox(t("number_of_decks"), options=[6, 8], index=1, key="play_decks")
+    penetration = st.sidebar.number_input(t("penetration_threshold"), min_value=1, value=52, step=1, key="play_penetration")
+    
+    # 策略选择
+    strategy_options = {
+        "flip-opposite-wait": t("flip_opposite_wait"),
+        "always-banker": t("always_banker"),
+        "always_player": t("always_player"),
+        "alternate": t("alternate"),
+        "random": t("random")
+    }
     strategy = st.sidebar.selectbox(
-        "strategy 策略",
-        options=["flip-opposite-wait", "always-banker", "always-player", "alternate", "random"],
+        t("betting_strategy"),
+        options=list(strategy_options.keys()),
+        format_func=lambda x: strategy_options[x],
         index=0,
         key="play_strategy",
     )
-    seed_str = st.sidebar.text_input("seed 随机种子 (可选)", key="play_seed_str")
+    
+    seed_str = st.sidebar.text_input(t("random_seed"), key="play_seed_str")
     seed = int(seed_str) if seed_str.strip().isdigit() else None
-    speed_sec = st.sidebar.slider("speed_sec 每局速度(秒)", min_value=0.0, max_value=60.0, value=0.3, step=0.1, key="play_speed")
-    auto_scroll = st.sidebar.checkbox("auto scroll 自动滚动到最新", value=True, key="play_auto_scroll")
-    rebate_pct = st.sidebar.number_input("rebate 返水比例(%)", min_value=0.0, max_value=10.0, value=0.0, step=0.1, key="play_rebate_pct")
+    speed_sec = st.sidebar.slider("Speed (sec)", min_value=0.0, max_value=60.0, value=0.3, step=0.1, key="play_speed")
+    auto_scroll = st.sidebar.checkbox("Auto scroll", value=True, key="play_auto_scroll")
+    rebate_pct = st.sidebar.number_input(t("rebate") + " (%)", min_value=0.0, max_value=10.0, value=0.0, step=0.1, key="play_rebate_pct")
     
     st.sidebar.markdown("---")
-    st.sidebar.markdown("**🎯 连输/连赢注码设置**")
-    loss_prog_pct = st.sidebar.number_input("loss progression 连输加注(%)", min_value=0.0, max_value=200.0, value=0.0, step=1.0, key="play_loss_prog")
+    st.sidebar.markdown(f"**{t('loss_progression')}**")
+    loss_prog_pct = st.sidebar.number_input(t("loss_increase_pct"), min_value=0.0, max_value=200.0, value=0.0, step=1.0, key="play_loss_prog")
     # 新增：连输减注(%)
-    loss_prog_dec_pct = st.sidebar.number_input("loss progression 连输减注(%)", min_value=0.0, max_value=99.0, value=0.0, step=1.0, key="play_loss_prog_dec")
-    loss_prog_start = st.sidebar.number_input("从第几连输开始加注", min_value=1, max_value=20, value=1, step=1, key="play_loss_prog_start")
-    loss_win_mode = st.sidebar.selectbox("赢后注码调整", options=["reset", "persist", "ignore"], index=0, key="play_loss_win_mode")
+    loss_prog_dec_pct = st.sidebar.number_input("Loss Decrease (%)", min_value=0.0, max_value=99.0, value=0.0, step=1.0, key="play_loss_prog_dec")
+    loss_prog_start = st.sidebar.number_input(t("loss_start_threshold"), min_value=1, max_value=20, value=1, step=1, key="play_loss_prog_start")
+    
+    # 模式选择
+    mode_options = {
+        "reset": t("reset"),
+        "persist": t("persist"), 
+        "ignore": t("ignore")
+    }
+    loss_win_mode = st.sidebar.selectbox(
+        t("loss_win_mode"),
+        options=list(mode_options.keys()),
+        format_func=lambda x: mode_options[x],
+        index=0,
+        key="play_loss_win_mode"
+    )
+    
     st.sidebar.markdown("---")
-    win_inc_pct = st.sidebar.number_input("win progression 连赢加注(%)", min_value=0.0, max_value=200.0, value=0.0, step=1.0, key="play_win_inc_pct")
-    win_dec_pct = st.sidebar.number_input("win progression 连赢减注(%)", min_value=0.0, max_value=99.0, value=0.0, step=1.0, key="play_win_dec_pct")
-    win_prog_start = st.sidebar.number_input("从第几连赢开始生效", min_value=1, max_value=20, value=1, step=1, key="play_win_prog_start")
-    win_loss_mode = st.sidebar.selectbox("输后注码调整(针对连赢设置)", options=["reset", "persist", "ignore"], index=0, key="play_win_loss_mode")
+    st.sidebar.markdown(f"**{t('win_progression')}**")
+    win_inc_pct = st.sidebar.number_input(t("win_increase_pct"), min_value=0.0, max_value=200.0, value=0.0, step=1.0, key="play_win_inc_pct")
+    win_dec_pct = st.sidebar.number_input(t("win_decrease_pct"), min_value=0.0, max_value=99.0, value=0.0, step=1.0, key="play_win_dec_pct")
+    win_prog_start = st.sidebar.number_input(t("win_start_threshold"), min_value=1, max_value=20, value=1, step=1, key="play_win_prog_start")
+    win_loss_mode = st.sidebar.selectbox(
+        t("win_loss_mode"),
+        options=list(mode_options.keys()),
+        format_func=lambda x: mode_options[x],
+        index=0,
+        key="play_win_loss_mode"
+    )
     
     # 加注计算说明
     if loss_prog_pct > 0:
@@ -1180,13 +1219,17 @@ def main():
     with st.sidebar:
         # 顶部品牌区：Logo + 版权
         render_sidebar_branding()
+        
+        # 语言选择器
+        render_language_selector()
+        
         st.markdown("---")
-        if st.button("🚪 登出系统"):
+        if st.button(t("login_system")):
             st.session_state.authenticated = False
             st.rerun()
     
-    mode = st.sidebar.radio("模式", options=["播放模式", "极速模式"], index=0, key="mode_radio")
-    if mode == "播放模式":
+    mode = st.sidebar.radio(t("mode"), options=[t("playback_mode"), t("fast_mode")], index=0, key="mode_radio")
+    if mode == t("playback_mode"):
         page_play_mode()
     else:
         page_fast_mode()
