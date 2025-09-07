@@ -26,7 +26,28 @@ A comprehensive Baccarat simulator with strategy backtesting, bet management, an
 - **流水分析** / Turnover analysis
 - **盈亏分布** / Profit/loss distribution charts
 
-## 🚀 快速开始 / Quick Start
+## ⚡ 快速体验 / Quick Demo
+
+**一键启动 Docker 版本 / One-click Docker startup:**
+```bash
+git clone https://github.com/lanlicyuen/Baccarat_Simulator.git
+cd Baccarat_Simulator
+export ACCESS_PASSWORD=12345aB  # 测试密码 / Test password
+docker-compose up -d
+# 浏览器访问: http://localhost:9006 / Browser: http://localhost:9006
+```
+
+**本地 Python 版本 / Local Python version:**
+```bash
+git clone https://github.com/lanlicyuen/Baccarat_Simulator.git
+cd Baccarat_Simulator
+pip install -r requirements.txt
+export ACCESS_PASSWORD=12345aB  # 测试密码 / Test password
+streamlit run app.py
+# 浏览器访问: http://localhost:8501 / Browser: http://localhost:8501
+```
+
+## 🚀 详细安装 / Detailed Installation
 
 ### 环境要求 / Requirements
 ```bash
@@ -83,23 +104,40 @@ Browser: http://localhost:8501
 出于安全考虑，需要设置访问密码：  
 For security reasons, you need to set an access password:
 
+**快速测试 / Quick Testing:**
+```bash
+# 测试密码 / Test Password: 12345aB
+export ACCESS_PASSWORD=12345aB
+```
+
+**完整配置 / Full Configuration:**
 ```bash
 # 方法1：使用 .env 文件 / Method 1: Using .env file
 cp .env.example .env
 # 编辑 .env 文件设置 ACCESS_PASSWORD / Edit .env file to set ACCESS_PASSWORD
+# 测试可用: ACCESS_PASSWORD=12345aB / For testing: ACCESS_PASSWORD=12345aB
 
 # 方法2：环境变量 / Method 2: Environment variable
-export ACCESS_PASSWORD=your_secure_password_here
+export ACCESS_PASSWORD=12345aB  # 测试密码 / Test password
+export ACCESS_PASSWORD=your_secure_password_here  # 生产密码 / Production password
 
 # 方法3：Docker Compose / Method 3: Docker Compose
 # 编辑 docker-compose.yml 中的 ACCESS_PASSWORD / Edit ACCESS_PASSWORD in docker-compose.yml
 ```
 
+⚠️ **安全提醒 / Security Notice:**
+- 测试密码: `12345aB` / Test password: `12345aB`
+- 生产环境请使用强密码 / Use strong password in production
+- 不要在公共环境暴露密码 / Don't expose password in public environments
+
 ## �🐳 Docker 部署 / Docker Deployment
 
 ### 使用 Docker Compose / Using Docker Compose
 ```bash
-# 设置密码环境变量 / Set password environment variable
+# 快速测试 / Quick Testing
+export ACCESS_PASSWORD=12345aB  # 测试密码 / Test password
+
+# 或设置自定义密码 / Or set custom password
 export ACCESS_PASSWORD=your_secure_password_here
 
 # 构建并启动 / Build and start
